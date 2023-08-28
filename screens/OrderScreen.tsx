@@ -1,55 +1,112 @@
-import { View, SafeAreaView, StyleSheet } from "react-native";
+import {
+  View,
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  Alert,
+} from "react-native";
 import { Text } from "react-native-paper";
 import InputField from "../components/InputField";
 import { useState, useEffect } from "react";
 import { Button } from "react-native-paper";
+import { createPaymentLink } from "../api/Api";
+import { WebView } from "react-native-webview";
+import { makeRedirectUri } from "expo-auth-session";
 
 export default function DemoScreen() {
-  const [name, setName] = useState("");
-  const [cast, setCast] = useState("");
-  const [content, setContent] = useState("");
-  
+  const [name, setName] = useState("Mì tôm Hảo Hảo ly");
+  const [cast, setCast] = useState("1000");
+  const [content, setContent] = useState("Thanh toan don hang");
+  const [errorName, setErrorName] = useState(false);
+  const [errorCast, setErrorCast] = useState(false);
+  const [errorContent, setErrorContent] = useState(false);
+  //Uri trả về từ  PayOs và mở nó trong Web View
+  const [redirectUrl, setRedirectUrl] = useState("");
   //Quản lý trạng thái nút bấm và gọi Api
   const [pressed, setPressed] = useState(undefined);
 
   useEffect(() => {
     if (pressed === undefined) return;
-    (async () => {})();
+    if (!name.length) setErrorName(true);
+    if (!cast.length) setErrorCast(true);
+    if (!content.length) setErrorContent(true);
+    if (!name.length || !cast.length || !content.length) {
+      setPressed(undefined);
+      return;
+    }
+    setRedirectUrl("");
+    (async () => {
+      try {
+        let res = await createPaymentLink({
+          productName: name,
+          price: parseInt(cast),
+          description: content,
+          returnUrl: "testapp://Result",
+          cancelUrl: "testapp://Result",
+        });
+        if (res.error === undefined)
+          throw new Error("Không thể kết nối đến server");
+        if (res.error !== 0) throw new Error(res.message);
+        setRedirectUrl(res.data.checkoutUrl);
+        setPressed(undefined);
+      } catch (error: any) {
+        Alert.alert(error.message);
+        setPressed(undefined);
+      }
+    })();
   }, [pressed]);
-  
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Text variant="headlineMedium" style={styles.headerText}>
-        Tạo mới đơn hàng
-      </Text>
-      <InputField
-        input={name}
-        setInput={setName}
-        label="Nhập tên sản phẩm"
-        headerText="Tên sản phẩm:"
-      />
-      <InputField
-        input={cast}
-        setInput={setCast}
-        label="Nhập đơn giá"
-        headerText="Đơn giá:"
-      />
-      <InputField
-        input={content}
-        setInput={setContent}
-        label=" Nhập nội dung:"
-        headerText="Nội dung thanh toán:"
-      />
-      <Button
-        mode="contained"
-        style={styles.button}
-        onPress={() => setPressed((prevState) => !prevState as any)}
-        loading={pressed}
-        disabled={pressed}
-      >
-        Đến trang thanh toán
-      </Button>
-    </SafeAreaView>
+    <>
+      <SafeAreaView style={styles.container}>
+        <Text variant="headlineMedium" style={styles.headerText}>
+          Tạo mới đơn hàng
+        </Text>
+        <InputField
+          input={name}
+          setInput={setName}
+          label="Nhập tên sản phẩm"
+          headerText="Tên sản phẩm:"
+          error={errorName}
+        />
+        <InputField
+          input={cast}
+          setInput={setCast}
+          label="Nhập đơn giá"
+          headerText="Đơn giá:"
+          keyboardType="numeric"
+          error={errorCast}
+        />
+        <InputField
+          input={content}
+          setInput={setContent}
+          label=" Nhập nội dung:"
+          headerText="Nội dung thanh toán:"
+          error={errorContent}
+        />
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => setPressed((prevState) => !prevState as any)}
+          loading={pressed}
+          disabled={pressed}
+        >
+          Đến trang thanh toán
+        </Button>
+      </SafeAreaView>
+      <ScrollView alwaysBounceVertical={false} bounces={false}>
+        <SafeAreaView>
+          <Modal
+            visible={redirectUrl.length !== 0}
+            hardwareAccelerated={true}
+            transparent={true}
+          >
+            <WebView source={{ uri: redirectUrl }} startInLoadingState={true} />
+          </Modal>
+        </SafeAreaView>
+      </ScrollView>
+    </>
   );
 }
 

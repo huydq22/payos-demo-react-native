@@ -3,17 +3,19 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import DemoScreen from "./screens/OrderScreen";
+import ResultScreen from "./screens/ResultScreen";
 import * as Linking from "expo-linking";
 
 const Stack = createStackNavigator();
-const prefix = Linking.createURL("/");
-
+const prefix = Linking.createURL("");
 export default function App() {
   const linking = {
-    prefixes: [prefix],
+    prefixes: ["testapp://"],
     config: {
       screens: {
         Demo: "Demo",
+        Result: "Result",
+        NotFound: '*',
       },
     },
   };
@@ -24,8 +26,11 @@ export default function App() {
           headerShown: false,
           gestureEnabled: false,
         }}
+        initialRouteName="Demo"
       >
         <Stack.Screen name="Demo" component={DemoScreen} />
+        <Stack.Screen name="Result" component={ResultScreen} options={{headerShown: true}} />
+
       </Stack.Navigator>
 
       <StatusBar style="auto" />

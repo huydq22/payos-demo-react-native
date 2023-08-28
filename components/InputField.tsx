@@ -6,11 +6,15 @@ export default function InputField({
   setInput,
   label,
   headerText,
+  error,
+  keyboardType,
 }: {
   input: string;
   setInput: (input: string) => void;
   label: string;
   headerText: string;
+  error: boolean;
+  keyboardType?: string;
 }) {
   return (
     <View style={styles.container}>
@@ -21,19 +25,20 @@ export default function InputField({
         mode="outlined"
         activeOutlineColor="rgb(93, 95, 239)"
         onChangeText={(input) => setInput(input)}
+        error={error}
+        keyboardType={keyboardType ? keyboardType : ("default" as any)}
       />
-        
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        marginVertical: 5,
-    },
-    headerText: {
-        fontSize: 16,
-        color: "#434343",
-        paddingBottom: 5,
-    }
+  container: {
+    marginVertical: 5,
+  },
+  headerText: {
+    fontSize: 16,
+    color: "#434343",
+    paddingBottom: 5,
+  },
 });
