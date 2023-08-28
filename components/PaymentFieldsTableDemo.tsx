@@ -37,7 +37,7 @@ export default function PaymentFieldTableDemo({ data }: any) {
       <DataTable style={styles.table}>
         <DataTable.Header>
           <DataTable.Title textStyle={styles.title}>
-            DS các trường dữ liệu trong WebHook
+            DS các trường dữ liệu trong Webhook
           </DataTable.Title>
         </DataTable.Header>
         <DataTable.Header>
