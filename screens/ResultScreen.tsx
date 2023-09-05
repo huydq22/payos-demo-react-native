@@ -15,6 +15,7 @@ export default function ResultScreen() {
         let res = await getOrder(orderCode);
         if (res.error === undefined) throw new Error("Không thể kết nối đến server");
         if (res.error !== 0) throw new Error(res.message);
+        console.log(res);
         setOrder(res.data);
       } catch (error: any) {
         Alert.alert(error.message);
@@ -29,7 +30,7 @@ export default function ResultScreen() {
     >
       <SafeAreaView style={styles.innerContainer}>
         <OrderTableDemo data={order} />
-        <PaymentFieldTableDemo data={(order as any)?.webhook_snapshot.data} />
+        <PaymentFieldTableDemo data={(order as any)?.webhook_snapshot?.data} />
       </SafeAreaView>
     </ScrollView>
   );
