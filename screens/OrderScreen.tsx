@@ -5,6 +5,7 @@ import {
   ScrollView,
   Modal,
   Alert,
+  Linking 
 } from "react-native";
 import { Text } from "react-native-paper";
 import InputField from "../components/InputField";
@@ -22,7 +23,6 @@ export default function DemoScreen() {
   const [errorCast, setErrorCast] = useState(false);
   const [errorContent, setErrorContent] = useState(false);
   //Uri trả về từ  PayOs và mở nó trong Web View
-  const [redirectUrl, setRedirectUrl] = useState("");
   //Quản lý trạng thái nút bấm và gọi Api
   const [pressed, setPressed] = useState(undefined);
 
@@ -35,7 +35,6 @@ export default function DemoScreen() {
       setPressed(undefined);
       return;
     }
-    setRedirectUrl("");
     (async () => {
       try {
         let res = await createPaymentLink({
@@ -48,7 +47,15 @@ export default function DemoScreen() {
         if (res.error === undefined)
           throw new Error("Không thể kết nối đến server");
         if (res.error !== 0) throw new Error(res.message);
-        setRedirectUrl(res.data.checkoutUrl);
+      
+        Linking.canOpenURL(res.data.checkoutUrl).then(supported => {
+          if (supported) {
+            Linking.openURL(res.data.checkoutUrl);
+          } else {
+            console.log("Don't know how to open URI: " + res.data.checkoutUrl);
+          }
+        });
+
         setPressed(undefined);
       } catch (error: any) {
         Alert.alert(error.message);
@@ -95,17 +102,6 @@ export default function DemoScreen() {
           Đến trang thanh toán
         </Button>
       </SafeAreaView>
-      <ScrollView alwaysBounceVertical={false} bounces={false}>
-        <SafeAreaView>
-          <Modal
-            visible={redirectUrl.length !== 0}
-            hardwareAccelerated={true}
-            transparent={true}
-          >
-            <WebView source={{ uri: redirectUrl }} startInLoadingState={true} />
-          </Modal>
-        </SafeAreaView>
-      </ScrollView>
     </>
   );
 }
