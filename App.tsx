@@ -7,10 +7,9 @@ import ResultScreen from "./screens/ResultScreen";
 import * as Linking from "expo-linking";
 
 const Stack = createStackNavigator();
-const prefix = Linking.createURL("");
 export default function App() {
   const linking = {
-    prefixes: ["testapp://"],
+    prefixes: ["testapp2://"],
     config: {
       screens: {
         Demo: "Demo",

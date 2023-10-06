@@ -5,7 +5,6 @@ import {
   ScrollView,
   Modal,
   Alert,
-  Linking 
 } from "react-native";
 import { Text } from "react-native-paper";
 import InputField from "../components/InputField";
@@ -14,6 +13,7 @@ import { Button } from "react-native-paper";
 import { createPaymentLink } from "../api/Api";
 import { WebView } from "react-native-webview";
 import { makeRedirectUri } from "expo-auth-session";
+import * as Linking from "expo-linking";
 
 export default function DemoScreen() {
   const [name, setName] = useState("Mì tôm Hảo Hảo ly");
@@ -41,8 +41,8 @@ export default function DemoScreen() {
           productName: name,
           price: parseInt(cast),
           description: content,
-          returnUrl: "testapp://Result",
-          cancelUrl: "testapp://Result",
+          returnUrl: `testapp2://Result`,
+          cancelUrl: "testapp2://Result",
         });
         if (res.error === undefined)
           throw new Error("Không thể kết nối đến server");
