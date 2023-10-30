@@ -1,5 +1,7 @@
 import { useRoute } from "@react-navigation/native";
-import { StyleSheet, ScrollView, Alert, SafeAreaView } from "react-native";
+import { StyleSheet, ScrollView, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useState, useEffect } from "react";
 import { getOrder } from "../api/Api";
 import OrderTableDemo from "../components/OrderTableDemo";
@@ -38,7 +40,6 @@ export default function ResultScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
     width: "95%",
     alignSelf: "center",
   },

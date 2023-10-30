@@ -71,7 +71,6 @@ export default function OrderTableDemo({ data }: any) {
 }
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
     gap: 10,
   },
   header: {

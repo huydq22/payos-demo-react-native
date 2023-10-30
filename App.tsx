@@ -2,18 +2,19 @@ import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import DemoScreen from "./screens/OrderScreen";
-import ResultScreen from "./screens/ResultScreen";
-import * as Linking from "expo-linking";
+import DemoScreen from "./src/screens/OrderScreen";
+import ResultScreen from "./src/screens/ResultScreen";
+import PaymentScreen from "./src/screens/PaymentScreen";
 
 const Stack = createStackNavigator();
 export default function App() {
   const linking = {
-    prefixes: ["testapp2://"],
+    prefixes: ["payosdemoreact://"],
     config: {
       screens: {
         Demo: "Demo",
         Result: "Result",
+        Payment: "Payment",
         NotFound: '*',
       },
     },
@@ -29,7 +30,7 @@ export default function App() {
       >
         <Stack.Screen name="Demo" component={DemoScreen} />
         <Stack.Screen name="Result" component={ResultScreen} options={{headerShown: true}} />
-
+        <Stack.Screen name="Payment" component={PaymentScreen}/>
       </Stack.Navigator>
 
       <StatusBar style="auto" />

@@ -1,21 +1,18 @@
 import {
   View,
-  SafeAreaView,
   StyleSheet,
   ScrollView,
   Modal,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
 import InputField from "../components/InputField";
 import { useState, useEffect } from "react";
 import { Button } from "react-native-paper";
 import { createPaymentLink } from "../api/Api";
-import { WebView } from "react-native-webview";
-import { makeRedirectUri } from "expo-auth-session";
 import * as Linking from "expo-linking";
-
-export default function DemoScreen() {
+export default function DemoScreen({navigation}: {navigation: any}) {
   const [name, setName] = useState("Mì tôm Hảo Hảo ly");
   const [cast, setCast] = useState("1000");
   const [content, setContent] = useState("Thanh toan don hang");
@@ -24,15 +21,15 @@ export default function DemoScreen() {
   const [errorContent, setErrorContent] = useState(false);
   //Uri trả về từ  PayOs và mở nó trong Web View
   //Quản lý trạng thái nút bấm và gọi Api
-  const [pressed, setPressed] = useState(undefined);
-
+  const [pressedButton1, setPressedButton1] = useState(undefined);
+  const [pressedButton2, setPressedButton2] = useState(undefined);
   useEffect(() => {
-    if (pressed === undefined) return;
+    if (pressedButton1 === undefined) return;
     if (!name.length) setErrorName(true);
     if (!cast.length) setErrorCast(true);
     if (!content.length) setErrorContent(true);
     if (!name.length || !cast.length || !content.length) {
-      setPressed(undefined);
+      setPressedButton1(undefined);
       return;
     }
     (async () => {
@@ -41,8 +38,8 @@ export default function DemoScreen() {
           productName: name,
           price: parseInt(cast),
           description: content,
-          returnUrl: `testapp2://Result`,
-          cancelUrl: "testapp2://Result",
+          returnUrl: `payosdemoreact://Result`,
+          cancelUrl: "payosdemoreact://Result",
         });
         if (res.error === undefined)
           throw new Error("Không thể kết nối đến server");
@@ -56,14 +53,43 @@ export default function DemoScreen() {
           }
         });
 
-        setPressed(undefined);
+        setPressedButton1(undefined);
       } catch (error: any) {
         Alert.alert(error.message);
-        setPressed(undefined);
+        setPressedButton1(undefined);
       }
     })();
-  }, [pressed]);
+  }, [pressedButton1]);
 
+  useEffect(() => {
+    if (pressedButton2 === undefined) return;
+    if (!name.length) setErrorName(true);
+    if (!cast.length) setErrorCast(true);
+    if (!content.length) setErrorContent(true);
+    if (!name.length || !cast.length || !content.length) {
+      setPressedButton2(undefined);
+      return;
+    }
+    (async () => {
+      try {
+        let res = await createPaymentLink({
+          productName: name,
+          price: parseInt(cast),
+          description: content,
+          returnUrl: `payosdemoreact://Result`,
+          cancelUrl: "payosdemoreact://Result",
+        });
+        if (res.error === undefined)
+          throw new Error("Không thể kết nối đến server");
+        if (res.error !== 0) throw new Error(res.message);
+        navigation.navigate("Payment", {token: res.data});
+        setPressedButton2(undefined);
+      } catch (error: any) {
+        Alert.alert(error.message);
+        setPressedButton2(undefined);
+      }
+    })();
+  }, [pressedButton2]);
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -95,11 +121,21 @@ export default function DemoScreen() {
         <Button
           mode="contained"
           style={styles.button}
-          onPress={() => setPressed((prevState) => !prevState as any)}
-          loading={pressed}
-          disabled={pressed}
+          onPress={() => setPressedButton1((prevState) => !prevState as any)}
+          loading={pressedButton1}
+          disabled={pressedButton1}
         >
           Đến trang thanh toán
+        </Button>
+        <Text style={{textAlign:"center"}}>Hoặc</Text>
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => setPressedButton2((prevState) => !prevState as any)}
+          loading={pressedButton2}
+          disabled={pressedButton2}
+        >
+          Đến giao diện thanh toán
         </Button>
       </SafeAreaView>
     </>
@@ -108,8 +144,6 @@ export default function DemoScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
-    marginTop: 20,
     width: "90%",
     alignSelf: "center",
   },
@@ -119,7 +153,7 @@ const styles = StyleSheet.create({
     color: "#000000",
   },
   button: {
-    marginTop: 20,
+    marginVertical: 20,
     width: "60%",
     alignSelf: "center",
     borderRadius: 10,
