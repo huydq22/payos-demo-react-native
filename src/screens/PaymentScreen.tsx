@@ -5,8 +5,7 @@ import TransferInfo from "../components/TransferInfo";
 import { PaperProvider } from "react-native-paper";
 
 const PaymentScreen = ({ navigation, route }: any) => {
-  const token = route.params.token;
-  console.log(token);
+  const token = route.params;
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -22,6 +21,7 @@ const PaymentScreen = ({ navigation, route }: any) => {
             bin={token.bin}
             description={token.description}
             qrCode={token.qrCode}
+            orderCode={token.orderCode}
           />
         </SafeAreaView>
       </PaperProvider>

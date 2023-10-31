@@ -22,7 +22,7 @@ const TransferInfoField = ({ label, text }: any) => {
         buttonColor="#E2D5FB"
         textColor="#6F4CC1"
       >
-        {pressed ? <Icon name="check" size={15} color="#6F4CC1" /> : "Sao chép"}
+        {pressed ? <Icon name="check" size={15} color="#6F4CC1" /> : <Text style={{fontSize: 12}}>Sao chép</Text>}
       </Button>
     </View>
   );

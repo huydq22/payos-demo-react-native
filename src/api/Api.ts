@@ -1,4 +1,4 @@
-import { ORDER_URL, VIETQR_URL } from "@env";
+import { SERVER_URL, VIETQR_URL } from "@env";
 import axios from "axios";
 export async function createPaymentLink(formValue: {
   description: string;
@@ -10,7 +10,7 @@ export async function createPaymentLink(formValue: {
   try {
     let res = await axios({
       method: "POST",
-      url: `${ORDER_URL}/order/create`,
+      url: `${SERVER_URL}/order/create`,
       data: formValue,
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export async function getOrder(orderId: string) {
   try {
     let res = await axios({
       method: "GET",
-      url: `${ORDER_URL}/order/${orderId}`,
+      url: `${SERVER_URL}/order/${orderId}`,
       headers: {
         "Content-Type": "application/json",
       },

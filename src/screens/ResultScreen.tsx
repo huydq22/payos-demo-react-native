@@ -6,7 +6,10 @@ import { useState, useEffect } from "react";
 import { getOrder } from "../api/Api";
 import OrderTableDemo from "../components/OrderTableDemo";
 import PaymentFieldTableDemo from "../components/PaymentFieldsTableDemo";
+import { Button } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 export default function ResultScreen() {
+  const navigation = useNavigation();
   const [order, setOrder] = useState();
   const route = useRoute();
   useEffect(() => {
@@ -29,11 +32,13 @@ export default function ResultScreen() {
       bounces={false}
       alwaysBounceVertical={false}
       style={styles.container}
+      showsVerticalScrollIndicator={false}
     >
       <SafeAreaView style={styles.innerContainer}>
         <OrderTableDemo data={order} />
         <PaymentFieldTableDemo data={(order as any)?.webhook_snapshot?.data} />
       </SafeAreaView>
+      <Button mode="text" onPress={() => navigation.navigate("Demo")} style={styles.button}> Quay về trang demo</Button>
     </ScrollView>
   );
 }
@@ -46,4 +51,9 @@ const styles = StyleSheet.create({
   innerContainer: {
     gap: 20,
   },
+  button:{
+    width: 200,
+    alignSelf: "center",
+    margin: 20
+  }
 });

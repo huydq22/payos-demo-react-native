@@ -4,18 +4,24 @@ import {
   Alert,
   Image,
   Text,
-  TouchableOpacity,
+  Pressable,
   PermissionsAndroid,
   Platform,
 } from "react-native";
-import { Button, Modal, Portal } from "react-native-paper";
+import { ActivityIndicator, Button, Modal, Portal } from "react-native-paper";
 import { getBanksList } from "../api/Api";
 import { useEffect, useState, useRef } from "react";
 import TransferInfoField from "./TransferInfoField";
 import QRCode from "react-native-qrcode-svg";
 import ViewShot from "react-native-view-shot";
 import { captureRef } from "react-native-view-shot";
-// import CameraRoll from '@react-native-community/cameraroll';
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import SocketIOClient from "socket.io-client";
+import { SERVER_URL } from "@env";
+import { useNavigation } from "@react-navigation/native";
+import { TransferInfoType } from "../../types/types";
+import Icon from "react-native-vector-icons/FontAwesome5";
+const socket = SocketIOClient(SERVER_URL);
 
 const TransferInfo = ({
   accountName,
@@ -24,26 +30,28 @@ const TransferInfo = ({
   bin,
   description,
   qrCode,
-}: any) => {
+  orderCode,
+}: TransferInfoType) => {
   const [bank, setBank] = useState({ logo: undefined, name: undefined });
   const [visible, setVisible] = useState(false);
+  const [status, setStatus] = useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  const viewShotRef = useRef(null);
 
+  const viewShotRef = useRef(null);
+  const navigation = useNavigation();
   const getPermissionAndroid = async () => {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-        {
-          title: 'Cấp quyền truy cập kho lưu trữ',
-          message:
-            'Ứng dụng cần quyền lưu ảnh vào thiết bị của bạn ',
-          buttonNeutral: 'Để sau',
-          buttonNegative: 'Từ chối',
-          buttonPositive: 'Cho phép',
-        },
-      );
+      let granted;
+      if (parseInt(Platform.Version.toString()) >= 32) {
+        granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+        );
+      } else {
+        granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+        );
+      }
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         return true;
       } else {
@@ -56,7 +64,7 @@ const TransferInfo = ({
 
   const captureAndSaveImage = async () => {
     try {
-      // Kiểm tra xem viewShotRef có khả dụng không
+      // Kiểm tra phiên bản android
       if (Platform.OS === "android") {
         const granted = await getPermissionAndroid();
         if (!granted) {
@@ -65,18 +73,23 @@ const TransferInfo = ({
       }
       if (viewShotRef.current) {
         const uri = await captureRef(viewShotRef, {
-          format: "jpg",
+          fileName: `${accountNumber}_${bin}_${amount}_${orderCode}_Qrcode.png`,
+          format: "png",
           quality: 0.8,
         });
-        await saveImageToStorage(uri, "image");
-        console.log("URI of the captured image:", uri);
+        const image = await CameraRoll.save(uri, { type: "photo" });
+        if (image) {
+          Alert.alert(
+            "",
+            "Image saved successfully.",
+            [{ text: "OK", onPress: () => {} }],
+            { cancelable: false }
+          );
+        }
       }
     } catch (error) {
       console.error("Error while capturing and saving image:", error);
     }
-  };
-  const saveImageToStorage = async (uri: string, fileName: string) => {
-   
   };
   useEffect(() => {
     (async () => {
@@ -90,12 +103,38 @@ const TransferInfo = ({
         Alert.alert(error.message);
       }
     })();
+    socket.emit("joinOrderRoom", orderCode);
+
+    socket.on("paymentUpdated", (data) => {
+      setStatus(true);
+      console.log(data);
+      socket.emit("leaveOrderRoom", orderCode);
+      // toast.success("Thanh toán thành công!");
+      setTimeout(() => {
+        navigation.navigate("Result", { orderCode: orderCode });
+      }, 3000);
+
+      // Cập nhật trạng thái đơn hàng trên giao diện người dùng
+    });
+
+    return () => {
+      socket.emit("leaveOrderRoom", orderCode);
+    };
   }, []);
-  const qrCodeOnPress = () => {
-    showModal();
-  };
   const cancelOrderHanlde = async () => {
-    
+    Alert.alert(
+      "Hủy thanh toán",
+      "Bạn có muốn hủy đơn hàng không?",
+      [
+        { text: "Hủy bỏ", onPress: () => {} },
+        {
+          text: "Xác nhận",
+          onPress: () =>
+            navigation.navigate("Result", { orderCode: orderCode }),
+        },
+      ],
+      { cancelable: false }
+    );
   };
   return (
     <View style={styles.container}>
@@ -150,9 +189,39 @@ const TransferInfo = ({
           Mở App Ngân hàng bất kỳ để quét mã VietQR hoặc chuyển khoản chính xác
           nội dung bên trên
         </Text>
-        <TouchableOpacity style={styles.qrCode} onPress={qrCodeOnPress}>
+        <Pressable
+          android_ripple={{ color: "#f6f6f6" }}
+          style={styles.qrCode}
+          onPress={showModal}
+        >
           <QRCode value={qrCode} size={200} backgroundColor="transparent" />
-        </TouchableOpacity>
+        </Pressable>
+        <View
+          style={{
+            flexDirection: "row",
+            alignContent: "center",
+            gap: 10,
+            justifyContent: "center",
+          }}
+        >
+          {!status && (
+            <>
+              <ActivityIndicator
+                size="small"
+                color="#6F4CC1"
+                animating={true}
+              />
+              <Text>Đang chờ thanh toán</Text>
+            </>
+          )}
+          {status && (
+            <>
+              <Icon name="check" size={20} color="#A4C936" />
+              <Text>Thanh toán thành công</Text>
+            </>
+          )}
+        </View>
+
         <Text style={{ textAlign: "center" }}>
           Lưu ý: Nhập chính xác nội dung{" "}
           <Text style={{ fontWeight: "bold" }}>{description}</Text> khi chuyển
@@ -173,7 +242,7 @@ const TransferInfo = ({
 const styles = StyleSheet.create({
   container: {
     borderColor: "grey",
-    borderWidth: 0.5,
+    borderWidth: 0.2,
     borderRadius: 10,
     overflow: "hidden",
   },

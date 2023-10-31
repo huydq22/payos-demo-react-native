@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { Button } from "react-native-paper";
 import { createPaymentLink } from "../api/Api";
 import * as Linking from "expo-linking";
+import { TransferInfoType } from "../../types/types";
 export default function DemoScreen({navigation}: {navigation: any}) {
   const [name, setName] = useState("Mì tôm Hảo Hảo ly");
   const [cast, setCast] = useState("1000");
@@ -82,7 +83,7 @@ export default function DemoScreen({navigation}: {navigation: any}) {
         if (res.error === undefined)
           throw new Error("Không thể kết nối đến server");
         if (res.error !== 0) throw new Error(res.message);
-        navigation.navigate("Payment", {token: res.data});
+        navigation.navigate("Payment", res.data as TransferInfoType);
         setPressedButton2(undefined);
       } catch (error: any) {
         Alert.alert(error.message);
@@ -135,7 +136,7 @@ export default function DemoScreen({navigation}: {navigation: any}) {
           loading={pressedButton2}
           disabled={pressedButton2}
         >
-          Đến giao diện thanh toán
+          Đến giao diện thanh toán tùy chỉnh
         </Button>
       </SafeAreaView>
     </>
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 20,
-    width: "60%",
+    width: "80%",
     alignSelf: "center",
     borderRadius: 10,
   },

@@ -5,3 +5,13 @@ export interface WebHookParamsType {
   orderCode: "703084";
   status: "CANCELLED";
 }
+
+export interface TransferInfoType {
+  accountName: string;
+  accountNumber: string;
+  amount: number;
+  bin: string;
+  description: string;
+  qrCode: string;
+  orderCode: number;
+}

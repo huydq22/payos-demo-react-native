@@ -5,8 +5,21 @@ import { createStackNavigator } from "@react-navigation/stack";
 import DemoScreen from "./src/screens/OrderScreen";
 import ResultScreen from "./src/screens/ResultScreen";
 import PaymentScreen from "./src/screens/PaymentScreen";
+import { TransferInfoType } from "./types/types";
+const Stack = createStackNavigator<RootStackParamList>();
 
-const Stack = createStackNavigator();
+export type RootStackParamList = {
+  Demo: undefined;
+  Result: { orderCode: number };
+  Payment: TransferInfoType;
+};
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList { }
+  }
+}
+
 export default function App() {
   const linking = {
     prefixes: ["payosdemoreact://"],
@@ -29,7 +42,7 @@ export default function App() {
         initialRouteName="Demo"
       >
         <Stack.Screen name="Demo" component={DemoScreen} />
-        <Stack.Screen name="Result" component={ResultScreen} options={{headerShown: true}} />
+        <Stack.Screen name="Result" component={ResultScreen}/>
         <Stack.Screen name="Payment" component={PaymentScreen}/>
       </Stack.Navigator>
 
