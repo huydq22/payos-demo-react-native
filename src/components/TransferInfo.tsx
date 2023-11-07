@@ -96,9 +96,9 @@ const TransferInfo = ({
       try {
         const resBank = await getBanksList();
         if (resBank.code != "00") throw new Error("Call to getBankList failed");
+
         const bank = resBank.data.filter((item: any) => item.bin == bin)[0];
         setBank((prev) => bank);
-        console.log(bank);
       } catch (error: any) {
         Alert.alert(error.message);
       }
@@ -174,7 +174,7 @@ const TransferInfo = ({
       </Portal>
       <View style={styles.header}>
         {bank.logo && (
-          <Image source={{ uri: bank.logo }} style={styles.image} />
+          <Image source={{ uri: bank?.logo }} style={styles.image} />
         )}
         <View style={styles.headerRight}>
           {bank.name && <Text style={styles.bankName}>{bank.name}</Text>}

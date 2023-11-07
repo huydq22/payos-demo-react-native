@@ -12,7 +12,7 @@ const OrderDetail = () => {
   return (
     <>
       <DataTable
-        style={{ borderColor: "grey", borderWidth: 0.2, borderRadius: 5 }}
+        style={{ borderColor: "grey", borderWidth: 0.5, borderRadius: 5 }}
       >
         <DataTable.Header>
           <DataTable.Title textStyle={styles.headerTable}>Tên</DataTable.Title>
@@ -25,9 +25,15 @@ const OrderDetail = () => {
         </DataTable.Header>
         {orders.map((order, index) => (
           <DataTable.Row key={index}>
-            <DataTable.Cell>{order.name}</DataTable.Cell>
-            <DataTable.Cell numeric>{order.price} vnd</DataTable.Cell>
-            <DataTable.Cell numeric>{order.quantity}</DataTable.Cell>
+            <DataTable.Cell>
+              <Text style={styles.text}>{order.name}</Text>
+            </DataTable.Cell>
+            <DataTable.Cell numeric>
+              <Text style={styles.text}>{order.price} vnd </Text>
+            </DataTable.Cell>
+            <DataTable.Cell numeric>
+              <Text style={styles.text}>{order.quantity}</Text>
+            </DataTable.Cell>
           </DataTable.Row>
         ))}
       </DataTable>
@@ -42,11 +48,16 @@ const styles = StyleSheet.create({
   headerTable: {
     fontWeight: "bold",
     textAlign: "center",
+    color: "black",
   },
   bottomTable: {
     fontWeight: "bold",
     textAlign: "right",
     padding: 10,
+    color: "black",
+  },
+  text: {
+    color: "grey",
   },
 });
 export default OrderDetail;
