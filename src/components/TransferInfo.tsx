@@ -106,13 +106,14 @@ const TransferInfo = ({
     socket.emit("joinOrderRoom", orderCode);
 
     socket.on("paymentUpdated", (data) => {
-      setStatus(true);
-      console.log(data);
-      socket.emit("leaveOrderRoom", orderCode);
-      // toast.success("Thanh toán thành công!");
-      setTimeout(() => {
-        navigation.navigate("Result", { orderCode: orderCode });
-      }, 3000);
+      if (data.orderId === orderCode) {
+        setStatus(true);
+        socket.emit("leaveOrderRoom", orderCode);
+        // toast.success("Thanh toán thành công!");
+        setTimeout(() => {
+          navigation.navigate("Result", { orderCode: orderCode });
+        }, 3000);
+      }
 
       // Cập nhật trạng thái đơn hàng trên giao diện người dùng
     });

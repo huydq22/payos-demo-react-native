@@ -83,6 +83,9 @@ export default function DemoScreen({navigation}: {navigation: any}) {
         if (res.error === undefined)
           throw new Error("Không thể kết nối đến server");
         if (res.error !== 0) throw new Error(res.message);
+
+        console.log(res.data);
+        
         navigation.navigate("Payment", res.data as TransferInfoType);
         setPressedButton2(undefined);
       } catch (error: any) {

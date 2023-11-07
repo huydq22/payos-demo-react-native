@@ -8,6 +8,7 @@ export async function createPaymentLink(formValue: {
   cancelUrl: string;
 }) {
   try {
+    console.log(SERVER_URL)
     let res = await axios({
       method: "POST",
       url: `${SERVER_URL}/order/create`,
