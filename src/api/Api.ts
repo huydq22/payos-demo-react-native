@@ -1,5 +1,58 @@
 import { SERVER_URL, VIETQR_URL } from "@env";
 import axios from "axios";
+
+// PayOS API endpoints
+export async function createPayment(paymentData: {
+  orderCode: number;
+  amount: number;
+  description: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
+  buyerAddress: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  returnUrl: string;
+  cancelUrl: string;
+  signature?: string;
+}) {
+  try {
+    console.log('Using API URL: https://fizennn.click');
+    let res = await axios({
+      method: "POST",
+      url: `https://fizennn.click/v1/payos/create-payment`,
+      data: paymentData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error('API error:', error, error?.response);
+    return error?.response?.data || error?.message || error;
+  }
+}
+
+export async function getPaymentInfo(orderCode: string) {
+  try {
+    let res = await axios({
+      method: "GET",
+      url: `https://fizennn.click/v1/payos/${orderCode}`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error('API error:', error, error?.response);
+    return error?.response?.data || error?.message || error;
+  }
+}
+
+// Legacy API functions (giữ lại để tương thích)
 export async function createPaymentLink(formValue: {
   description: string;
   productName: string;
@@ -8,10 +61,10 @@ export async function createPaymentLink(formValue: {
   cancelUrl: string;
 }) {
   try {
-    console.log(SERVER_URL)
+    console.log('Using API URL: https://fizennn.click')
     let res = await axios({
       method: "POST",
-      url: `${SERVER_URL}/order/create`,
+      url: `https://fizennn.click/order/create`,
       data: formValue,
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +80,7 @@ export async function getOrder(orderId: string) {
   try {
     let res = await axios({
       method: "GET",
-      url: `${SERVER_URL}/order/${orderId}`,
+      url: `https://fizennn.click/order/${orderId}`,
       headers: {
         "Content-Type": "application/json",
       },

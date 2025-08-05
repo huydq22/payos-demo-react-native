@@ -15,7 +15,6 @@ import TransferInfoField from "./TransferInfoField";
 import QRCode from "react-native-qrcode-svg";
 import ViewShot from "react-native-view-shot";
 import { captureRef } from "react-native-view-shot";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import SocketIOClient from "socket.io-client";
 import { SERVER_URL } from "@env";
 import { useNavigation } from "@react-navigation/native";
